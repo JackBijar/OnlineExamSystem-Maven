@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+       	http://www.springframework.org/schema/tx 
+       	http://www.springframework.org/schema/tx/spring-tx.xsd
+       	http://www.springframework.org/schema/mvc 
+       	http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       	http://www.springframework.org/schema/context 
+       	http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Specifying base package of the Components like Controller, Service,DAO -->
+	<context:component-scan base-package="com.mayabious.examsystem.controller" />
+	
+	<mvc:annotation-driven />	
+	<mvc:default-servlet-handler />	
+	
+	<!-- Getting Database properties -->
+	<context:property-placeholder location="classpath:database.properties" />
+	
+	<!-- Specifying the Resource location to load JS, CSS, Images etc -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
+	<!-- View Resolver -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- DataSource -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"	destroy-method="close">
+		<property name="driverClass" value="${database.driverClass}" />
+		<property name="jdbcUrl" value="${database.url}" />
+		<property name="user" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+
+		<property name="acquireIncrement" value="${connection.acquireIncrement}" />
+		<property name="minPoolSize" value="${connection.minPoolSize}" />
+		<property name="maxPoolSize" value="${connection.maxPoolSize}" />
+		<property name="maxIdleTime" value="${connection.maxIdleTime}" />
+	</bean>
+	
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+			</props>
+		</property>
+		<property name="packagesToScan" value="com.mayabious.examsystem.model"></property>
+	</bean>
+	
+	<!-- Transaction -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	 <tx:annotation-driven /> 
+	 
+	 <!-- @Autowired Property for Service -->
+	 <bean id="adminService" class="com.mayabious.examsystem.service.AdminServiceImpl"></bean>
+	 <bean id="candidateService" class="com.mayabious.examsystem.service.CandidateServiceImpl"></bean>
+	 <bean id="examService" class="com.mayabious.examsystem.service.ExamServiceImpl"></bean>
+	 
+	 
+	 
+	 <!-- @Autowired Property for Dao -->
+	 <bean id="adminDao" class="com.mayabious.examsystem.dao.AdminDaoImpl"></bean>
+	 <bean id="candidateDao" class="com.mayabious.examsystem.dao.CandidateDaoImpl"></bean>
+	 <bean id="examDao" class="com.mayabious.examsystem.dao.ExamDaoImpl"></bean>
+	 
+	 
+	 <!-- @Autowired Property for Util -->
+	 
+	 <bean id="adminDaoUtil" class="com.mayabious.examsystem.util.AdminDaoUtil"></bean>	 
+	 <bean id="candidateDaoUtil" class="com.mayabious.examsystem.util.CandidateDaoUtil"></bean>
+	 <bean id="examDaoUtil" class="com.mayabious.examsystem.util.ExamDaoUtil"></bean> 
+	 
+	 <!-- @Autowired Property for Business -->
+	 <bean id="examBusinessLogic" class="com.mayabious.examsystem.business.ExamBusinessLogicImpl"></bean>
+	 
+	 
+	  <!-- <tx:annotation-driven transaction-manager="transactionManager" /> -->
+	
+	  <!-- <bean id="persistenceExceptionTranslationPostProcessor"
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" /> -->
+		
+</beans>
