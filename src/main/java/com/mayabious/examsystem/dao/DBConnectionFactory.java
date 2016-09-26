@@ -12,7 +12,8 @@ public class DBConnectionFactory
 		try 
 		{
 			Class.forName("com.mysql.jdbc.Driver"); 
-			con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:12345/examination_system", "root", "root");
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:12345/examination_system", "root", "root");
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/examination_system", "root", "root");
 			
 			if(con != null)
 				System.out.println("Success");
