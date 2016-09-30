@@ -1,12 +1,12 @@
 package com.mayabious.examsystem.dao;
 
-import com.mayabious.examsystem.bean.CandidateBean;
+import com.mayabious.examsystem.model.CandidateModel;
 
 public interface CandidateDao 
 {
-	public CandidateBean getCDetails(String cMobile);
+	public CandidateModel getCDetails(String cMobile);
 	
-	public CandidateBean saveCInfo(CandidateBean candidateBean);
+	public CandidateModel saveCInfo(CandidateModel candidateModel);
 	
-	public CandidateBean updateCProfile(CandidateBean candidateBean);
+	public CandidateModel updateCProfile(CandidateModel candidateModel);
 }

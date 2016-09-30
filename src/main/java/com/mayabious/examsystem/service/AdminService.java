@@ -5,6 +5,7 @@ import java.util.List;
 import com.mayabious.examsystem.bean.AdminBean;
 import com.mayabious.examsystem.bean.CandidateBean;
 import com.mayabious.examsystem.model.AdminModel;
+import com.mayabious.examsystem.model.CandidateModel;
 
 public interface AdminService 
 {
@@ -14,10 +15,10 @@ public interface AdminService
 	
 	public List<AdminModel> getInActiveAdmin();
 	
-	public int activeAdminAccess(long adminId);
+	public void activeAdminAccess(long adminId);
 	
-	public CandidateBean getCandidateinfo(long cId);
+	public CandidateModel showCandidateInfo(long cId);
 	
-	public int clearExamInfo(long cMobile);
+	public void clearExamInfo();
 	
 }

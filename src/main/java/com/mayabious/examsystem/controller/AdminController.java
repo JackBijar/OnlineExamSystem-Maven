@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mayabious.examsystem.bean.AdminBean;
-import com.mayabious.examsystem.bean.CandidateBean;
 import com.mayabious.examsystem.business.ExamBusinessLogic;
 import com.mayabious.examsystem.model.AdminModel;
+import com.mayabious.examsystem.model.CandidateModel;
 import com.mayabious.examsystem.service.AdminService;
 
 import static com.mayabious.examsystem.constant.Constant.INDEX_PAGE;
@@ -35,43 +35,37 @@ public class AdminController
 	ExamBusinessLogic examBusinessLogic;
 	
 	static final Logger LOGGER = Logger.getLogger(AdminController.class);
-	AdminModel adminModel;
+	AdminModel adminModel = null;
+	CandidateModel candidateModel = null;
 	
 	String jsonString = "";		
 	int status = 0;
+	long statusId = 0;
 	
 	List<AdminModel> adminModelList;
 
-/*----------------------------------------------------New Admin Sing Up--------------------------------------------------------------*/	
+/*----------------------------------------------------New Admin Sing Up----------------------------------------------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/aSingUp", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView aSingUp(@ModelAttribute ("dataString") AdminModel adminModel, BindingResult result)  
-	 { 				
-		System.out.println(adminModel.getAdminName()+" == "+adminModel.getAdminMobile());
+	 @ResponseBody public ModelAndView aSingUp(@ModelAttribute ("dataString") AdminModel adminModel, BindingResult result)  
+	 {	
 		LOGGER.info("Login INFO Test : "+adminModel.getAdminName()+" == "+adminModel.getAdminMobile());
 		
-		adminModel = adminService.saveAdminInfo(adminModel);
-		
-		/*jsonString = examBusinessLogic.objectToJsonString(adminBean);			
-		return jsonString;*/	
+		this.adminModel = adminService.saveAdminInfo(adminModel);
 		
 		return new ModelAndView(INDEX_PAGE, LOGIN_STATUS, "Registration Status Active by Admin");
 	 }	
 	
-/*-----------------------------------------------------Admin Sing In------------------------------------------------------------------*/	
+/*-----------------------------------------------------Admin Sing In-------------------------------------------------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/aSingIn", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView aSingIn(@RequestParam("adminMobile") String adminMobile,
+	 @ResponseBody public ModelAndView aSingIn(@RequestParam("adminMobile") String adminMobile,
 			 								   @RequestParam("adminPass") String adminPass)  
-	 {  
-		System.out.println("adminPass : "+adminPass+" adminMobile :"+adminMobile);
-		
+	 { 
 		adminModel = adminService.getAdminDetails(adminMobile, adminPass);
 		
 		if(adminModel.getAdminId() != 0 && adminModel.getAdminRegStatus() != 0)
 		{			
-			System.out.println("IDDD :"+adminModel.getAdminId());
-			//jsonString = examBusinessLogic.objectToJsonString(adminBean);
 			return new ModelAndView("adminHome","adminBean",adminModel);
 		}
 		else
@@ -80,92 +74,76 @@ public class AdminController
 		}		
 	 }
 	
-/*----------------------------------------------------Show All Inactive New Admin----------------------------------------------------------*/	
+/*----------------------------------------------------Show All Inactive New Admin------------------------------------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/activeNewAdmin", method = RequestMethod.GET, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView activeNewAdmin()  
+	 @ResponseBody public ModelAndView activeNewAdmin()  
 	 {  		
-		adminModelList = new ArrayList<AdminModel>();	
+		adminModelList = new ArrayList<>();	
 		
 		adminModelList = adminService.getInActiveAdmin();
 		
 		return new ModelAndView("activeAdmin", "adminBeanList", adminModelList);
 	 }
 	
-/*----------------------------------------------------Activate Admin Access permission ---------------------------------------------------------------*/	
+/*----------------------------------------------------Activate Admin Access Permission ------------------------------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/activeAdminAccess", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody String activeAdminAccess(@ModelAttribute ("adminId") AdminBean adminBean, BindingResult result)  
-	 {   	
+	 @ResponseBody public String activeAdminAccess(@ModelAttribute ("adminId") AdminBean adminBean, BindingResult result)  
+	 { 	
+		adminModelList = new ArrayList<>();
+				
+		adminService.activeAdminAccess(adminBean.getAdminId());		
 		
-		adminModelList = new ArrayList<AdminModel>();
+		adminModelList = adminService.getInActiveAdmin();
 		
-		System.out.println("adminId "+adminBean.getAdminId());	
-		
-		status = adminService.activeAdminAccess(adminBean.getAdminId());		
-		if(status > 0)
-		{
-			System.out.println("Activated");
-			adminModelList = adminService.getInActiveAdmin();
-			jsonString = examBusinessLogic.objectToJsonString(adminModelList);
-		}
-		else
-			System.out.println("Not Activated");
+		jsonString = examBusinessLogic.objectToJsonString(adminModelList);
 		
 		return jsonString;
 	 }
 	
-	
-/*-----------------------------------------------------Show Candidate Info----------------------------------------------------------------------------*/
+/*-----------------------------------------------------Show Candidate Info-------------------------------------------------------------------------------------------------*/
 	
 	@RequestMapping(value = "/showCandidateInfo", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody String showCandidateInfo(@ModelAttribute ("cId") CandidateBean candidateBean, BindingResult result)  
-	 { 
-		System.out.println("CID : "+candidateBean.getcId());
+	 @ResponseBody public String showCandidateInfo(@ModelAttribute ("cId") CandidateModel candidateModel, BindingResult result)  
+	 {		
+		this.candidateModel = adminService.showCandidateInfo(candidateModel.getcId());		
+			
+		jsonString = examBusinessLogic.objectToJsonString(candidateModel);
 		
-		candidateBean = adminService.getCandidateinfo(candidateBean.getcId());
-		if(candidateBean != null)
-		{
-			System.out.println(candidateBean.getcMobile());
-			jsonString = examBusinessLogic.objectToJsonString(candidateBean);
-		}
-		else
-		{
-			System.out.println("Data Not Found");
-			jsonString = "Data Not Found";
-		}
 		return jsonString;
 	 }
 
-/*-----------------------------------------------------Clear Candidate Exam Information [Testing Purpose]----------------------------------------------------------*/	
+/*-----------------------------------------------------Clear Candidate Exam Information [Testing Purpose]------------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/clearExamInfo", method = RequestMethod.GET, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView clearExamInfo()  
-	 { 	
-		
-		status = adminService.clearExamInfo(0);	//Hard Codded Mobile No '0'
+	 @ResponseBody public ModelAndView clearExamInfo()  
+	 {
+		adminService.clearExamInfo();
 		
 		return new ModelAndView("candidateHome", "message", "Successfully Clear Exam Info");
 	 }	
 	
-/*========================================================= SEND IN JSP PAGE =============================================================================*/
 	
-/*----------------------------------------------------Admin Home Page--------------------------------------------------------------------------------*/	
+	
+/*========================================================= SEND IN JSP PAGE ==============================================================================================*/
+	
+
+	/*----------------------------------------------------Admin Home Page--------------------------------------------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/adminHomePage", method = RequestMethod.GET, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView adminHomePage()  
+	 @ResponseBody public ModelAndView adminHomePage()  
 	 {  		
 		//Get User Info
 		return new ModelAndView("adminHome");
 	 }
 	
-/*----------------------------------------------------Admin Logout-------------------------------------------------------------------------------------*/	
+/*----------------------------------------------------Admin Logout---------------------------------------------------------------------------------------------------------*/	
 
 	@RequestMapping(value = "/adminLogout", method = RequestMethod.GET, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView adminLogout()  
+	 @ResponseBody public ModelAndView adminLogout()  
 	 {  		
 		//Remove all Info
 		return new ModelAndView(INDEX_PAGE);
 	 }	
-	
 }

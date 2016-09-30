@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mayabious.examsystem.bean.CandidateBean;
 import com.mayabious.examsystem.dao.CandidateDao;
 import com.mayabious.examsystem.dao.CandidateDaoImpl;
+import com.mayabious.examsystem.model.CandidateModel;
 
 @Service
 @Transactional
@@ -15,26 +16,19 @@ public class CandidateServiceImpl implements CandidateService
 	@Autowired
 	private CandidateDao candidateDao;
 	
-	public CandidateBean getCDetails(String cMobile) 
-	{
-		
+	public CandidateModel getCDetails(String cMobile) 
+	{		
 		return candidateDao.getCDetails(cMobile);
 	}
-
-
 	
-	public CandidateBean saveCInfo(CandidateBean candidateBean) 
-	{
-		
-		return candidateDao.saveCInfo(candidateBean);
+	public CandidateModel saveCInfo(CandidateModel candidateModel) 
+	{		
+		return candidateDao.saveCInfo(candidateModel);
 	}
-
-
 	
-	public CandidateBean updateCProfile(CandidateBean candidateBean) 
-	{
-		
-		return candidateDao.updateCProfile(candidateBean);
+	public CandidateModel updateCProfile(CandidateModel candidateModel) 
+	{		
+		return candidateDao.updateCProfile(candidateModel);
 	}
 
 }

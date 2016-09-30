@@ -18,17 +18,22 @@ import org.springframework.web.servlet.ModelAndView;
 import com.mayabious.examsystem.bean.CandidateBean;
 import com.mayabious.examsystem.business.ExamBusinessLogic;
 import com.mayabious.examsystem.business.ExamBusinessLogicImpl;
+import com.mayabious.examsystem.model.CandidateModel;
 import com.mayabious.examsystem.service.CandidateService;
 import com.mayabious.examsystem.service.CandidateServiceImpl;
 
+import static com.mayabious.examsystem.constant.Constant.*;
+
+
+
 @RestController
-@SessionAttributes("candidateBean")
+@SessionAttributes("candidateModel")
 public class CandidateController 
 {
 	@Autowired
 	CandidateService candidateService;
 	
-	CandidateBean candidateBean = null;
+	CandidateModel candidateModel = null;
 	
 	ExamBusinessLogic examBusinessLogic = null;
 	
@@ -40,77 +45,61 @@ public class CandidateController
 /*-----------------------------------------------------New Candidate Sing Up----------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/cSingUp", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView cSingUp(@ModelAttribute ("dataString") CandidateBean candidateBean, BindingResult result)  
-	 { 	
+	 @ResponseBody public ModelAndView cSingUp(@ModelAttribute ("dataString") CandidateModel candidateModel, BindingResult result)  
+	 { 
+		this.candidateModel = candidateService.saveCInfo(candidateModel);	
 		
-		examBusinessLogic = new ExamBusinessLogicImpl();
-		
-		candidateBean = candidateService.saveCInfo(candidateBean);
-		
-		//jsonString = examBusinessLogic.objectToJsonString(candidateBean);
-		if(candidateBean.getcId() != 0)
+		if(candidateModel.getcId() != 0)
 		{
-			return new ModelAndView("candidateHome","candidateBean",candidateBean);
+			return new ModelAndView(C_HOME_PAGE, CANDIDATE_MODEL, candidateModel);
 		}		
 		else
 		{
-			return new ModelAndView("index","singUpStatus","Some Problem Not Successfuly... Sing Up");
+			return new ModelAndView(INDEX_PAGE, REG_STATUS, NOT_REG_STATUS_MSG);
 		}
-		
 	 }
 	
 /*-----------------------------------------------------Candidate Sing In---------------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/cSingIn", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView cSingIn(@RequestParam("cMobile") String cMobile)  
-	 {  
-		  LOGGER.info("Login INFO");
-		  candidateBean = new CandidateBean();
+	 @ResponseBody public ModelAndView cSingIn(@RequestParam("cMobile") String cMobile)  
+	 {
+		  candidateModel = candidateService.getCDetails(cMobile);
 		  
-		  examBusinessLogic = new ExamBusinessLogicImpl();
-		  
-		  candidateBean = candidateService.getCDetails(cMobile);
-		  //jsonString = examBusinessLogic.objectToJsonString(candidateBean);
-		  
-		  System.out.println("Sing Up Successfully : "+candidateBean.getcName());		  
-		  LOGGER.info("Sing Up Successfully : "+candidateBean.getcName());
-		  
-		  if(candidateBean.getcId() != 0)
-	  		  return new ModelAndView("candidateHome","candidateBean",candidateBean);
+		  if(candidateModel.getcId() != 0)
+	  		  return new ModelAndView(C_HOME_PAGE, "candidateModel", candidateModel);
 		  else
-		  return new ModelAndView("index","loginStatus","You are Not a Register Candidate, Please Sing Up");		  
+			  return new ModelAndView(INDEX_PAGE, LOGIN_STATUS, NOT_REG_C_MSG);		  
 	 } 
 	
 /*-----------------------------------------------------Show Candidate Profile-------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/showCandidateProfile", method = RequestMethod.GET, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView candidateProfile(HttpServletRequest request, HttpSession session)  
+	 @ResponseBody public ModelAndView candidateProfile(HttpServletRequest request, HttpSession session)  
 	 { 
-		candidateBean = new CandidateBean();
-		
+		candidateModel = new CandidateModel();
 		
 		session = request.getSession();
-		candidateBean = (CandidateBean) session.getAttribute("candidateBean");		
+		candidateModel = (CandidateModel) session.getAttribute("candidateModel");		
 		
-		System.out.println("CID : "+candidateBean.getcId());
+		System.out.println("CID : "+candidateModel.getcId());
 		
-		candidateBean = candidateService.getCDetails(candidateBean.getcMobile());		
+		candidateModel = candidateService.getCDetails(candidateModel.getcMobile());		
 		
-		return new ModelAndView("candidateProfile", "candidateBean", candidateBean);
+		return new ModelAndView("candidateProfile", "candidateModel", candidateModel);
 	 }
 	
 
 /*-----------------------------------------------------Update Candidate Profile----------------------------------------------------------*/	
 	
 	@RequestMapping(value = "/updateCProfile", method = RequestMethod.POST, headers="Accept=application/json")  
-	 public @ResponseBody ModelAndView updateCandidateProfile(@ModelAttribute ("dataString") CandidateBean candidateBean, BindingResult result)  
-	 { 	
-		
+	 public @ResponseBody ModelAndView updateCandidateProfile(@ModelAttribute ("dataString") CandidateModel candidateModel, BindingResult result)  
+	 { 			
 		examBusinessLogic = new ExamBusinessLogicImpl();
 		
-		candidateBean = candidateService.updateCProfile(candidateBean);
+		candidateModel = candidateService.updateCProfile(candidateModel);
 		
-		return new ModelAndView("candidateProfile", "candidateBean", candidateBean);
+		return new ModelAndView("candidateProfile", "candidateModel", candidateModel);
 	 }
 
 

@@ -12,8 +12,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name="admin_info")
 public class AdminModel implements Serializable
-{
-	
+{	
+	private static final long serialVersionUID = -701008185257147848L;
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="admin_id")
@@ -29,7 +30,7 @@ public class AdminModel implements Serializable
 	private String adminPass;
 
 	@Column(name="admin_reg_status", nullable = false, columnDefinition = "int default 100")	//check default
-	private int adminRegStatus;
+	private long adminRegStatus;
 	
 	
 	public long getAdminId() {
@@ -68,8 +69,8 @@ public class AdminModel implements Serializable
 		return adminRegStatus;
 	}
 
-	public void setAdminRegStatus(int adminRegStatus) {
-		this.adminRegStatus = adminRegStatus;
+	public void setAdminRegStatus(long commonObjList) {
+		this.adminRegStatus = commonObjList;
 	}
 
 	@Override

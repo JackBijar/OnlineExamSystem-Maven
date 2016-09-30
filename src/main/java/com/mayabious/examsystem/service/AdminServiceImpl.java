@@ -12,6 +12,7 @@ import com.mayabious.examsystem.bean.CandidateBean;
 import com.mayabious.examsystem.dao.AdminDao;
 import com.mayabious.examsystem.dao.AdminDaoImpl;
 import com.mayabious.examsystem.model.AdminModel;
+import com.mayabious.examsystem.model.CandidateModel;
 
 @Service
 @Transactional
@@ -26,38 +27,32 @@ public class AdminServiceImpl implements AdminService
 	}
 	
 	public AdminModel saveAdminInfo(AdminModel adminModel) 
-	{
-		
+	{		
 		return adminDao.saveAdminInfo(adminModel);
 	}
 
 	
 	public List<AdminModel> getInActiveAdmin() 
-	{		
-			
+	{			
 		return adminDao.getInActiveAdmin();
 	}
 
 	
-	public int activeAdminAccess(long adminId) 
-	{
-		
-		return adminDao.activeAdminAccess(adminId);
+	public void activeAdminAccess(long adminId) 
+	{		
+		adminDao.activeAdminAccess(adminId);
 	}
 
 	
-	public CandidateBean getCandidateinfo(long cId) 
+	public CandidateModel showCandidateInfo(long cId) 
 	{
-		
-		
-		return adminDao.getCandidateinfo(cId);
+		return adminDao.showCandidateInfo(cId);
 	}
 
 	
-	public int clearExamInfo(long cMobile) 
-	{
-		
-		return adminDao.clearExamInfo(cMobile);
+	public void clearExamInfo() 
+	{		
+		adminDao.clearExamInfo();
 	}
 
 }

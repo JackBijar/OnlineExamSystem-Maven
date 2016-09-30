@@ -1,14 +1,18 @@
 package com.mayabious.examsystem.dao;
 
+import static com.mayabious.examsystem.constant.Constant.LOGGER_STATUS;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.mayabious.examsystem.bean.CandidateBean;
+import com.mayabious.examsystem.model.CandidateModel;
 import com.mayabious.examsystem.util.AdminDaoUtil;
 import com.mayabious.examsystem.util.CandidateDaoUtil;
 
@@ -18,19 +22,35 @@ public class CandidateDaoImpl implements CandidateDao
 	@Autowired
 	private CandidateDaoUtil candidateDaoUtil;
 	
+	static final Logger LOGGER = Logger.getLogger(CandidateDaoImpl.class);
+	
 	Connection con = null;
 	ResultSet rs = null;
 	PreparedStatement pst = null;
 	
 	CandidateBean candidateBean = null;
+	CandidateModel candidateModel = null;
+	
 	int status = 0;
 	
-/*===================================================== Get Candidate Info =====================================================*/
+	String statusMsg = "";
+	long statusId = 0;	
 	
-	
-	public CandidateBean getCDetails(String cMobile) 
+//--------------------------------------------------------------------Get Candidate Info------------------------------------------------------------------------------//
+	public CandidateModel getCDetails(String cMobile) 
 	{
-		candidateBean = new CandidateBean();		
+		candidateModel = candidateDaoUtil.getCDetails(cMobile);		
+		
+		if(statusId > 0)
+		{
+			adminModel.setAdminId(statusId);
+			LOGGER.info(LOGGER_STATUS + "Admin Information Save Successfully");
+		}			
+		else
+		{
+			LOGGER.info(LOGGER_STATUS + "Admin Information Not Successfully Save");
+		}			
+		
 		try
 		{
 			con = DBConnectionFactory.getConnection();
@@ -70,9 +90,39 @@ public class CandidateDaoImpl implements CandidateDao
 
 /*===================================================== Save Candidate Info =====================================================*/
 	
-	
-	public CandidateBean saveCInfo(CandidateBean candidateBean) 
-	{		
+	@Override
+	public CandidateModel saveCInfo(CandidateModel candidateModel) 
+	{
+		candidateModel = candidateDaoUtil.checkRegister(candidateModel.getcMobile());
+		
+		if(candidateModel != null)
+		{
+			// Candidate already Exist So UPDATE Candidate Info			
+			statusId = candidateDaoUtil.reSetCandidateInfo(candidateModel.getcId(), candidateModel.getcStatus());
+			
+			if(statusId > 0)
+			{
+				// UPDATE [c_status] Complete in candidate_info Table
+				
+			}
+		}
+		else
+		{
+			
+		}
+		
+		statusId = (Long) candidateDaoUtil.saveCInfo(candidateModel);
+		
+		if(statusId > 0)
+		{
+			candidateModel.setcId(statusId);
+			LOGGER.info(LOGGER_STATUS + "Admin Information Save Successfully");
+		}			
+		else
+		{
+			LOGGER.info(LOGGER_STATUS + "Admin Information Not Successfully Save");
+		}
+		
 		try
 		{
 			con = DBConnectionFactory.getConnection();
